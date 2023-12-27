@@ -1,9 +1,9 @@
 ## all imports of packages
-import yaml
-from sqlalchemy import create_engine
 import pandas as pd
 import psycopg2
+from sqlalchemy import create_engine
 from sqlalchemy import text
+import yaml
 
 class RDSDatabaseConnector:
     def __init__(self):
@@ -29,6 +29,7 @@ class RDSDatabaseConnector:
             df = pd.read_sql_table('loan_payments', conn)
             df.to_csv('loan_payments.csv', sep='\t')
 
-con_db = RDSDatabaseConnector()
-con_db.db_connect()
-con_db.db_extract_data()
+if __name__ == "__main__":
+    con_db = RDSDatabaseConnector()
+    con_db.db_connect()
+    con_db.db_extract_data()

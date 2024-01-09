@@ -33,7 +33,6 @@ class Plotter:
 
     def identify_Collinearity(self):
         loans_subset_df = self.df[['loan_amount', 'int_rate' ]]
-        # loans_subset_df = self.df.astype[['int_rate': float, 'grade']]
-        px.imshow(loans_subset_df.corr(), title="Correlation heatmap of loans dataframe")
-        plt.show()
+        fig = px.imshow(loans_subset_df.corr(), title="Correlation heatmap of loans dataframe")
+        fig.show()
 

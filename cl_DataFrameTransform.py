@@ -68,3 +68,21 @@ class DataFrameTransform:
         self.df = self.df.drop(self.df[(self.df.int_rate == 6) & (self.df.grade.isin(['B','C','D','E','F']))].index)
         sns.scatterplot(y=self.df['int_rate'], x=self.df['grade'])
         plt.show()
+
+    def per_of_loans_recovered(self):
+        loans_subset_df = self.df[['funded_amount','total_payment', 'term', 'instalment']].copy()
+        print(loans_subset_df.head())
+        # loans_subset_df['perc_of_ln_recd'] = self.df(['total_payment'] / ['funded_amount'])
+        # loans_subset_df = loans_subset_df.assign(perc_of_ln_recd=self.df(['total_payment'] / ['funded_amount']))
+        # loans_subset_df['perc_of_ln_recd'] = self.df['total_payment'] / self.df['funded_amount']
+        v_term_in_num = self.df['term'].str.slice(0,2).astype(float).fillna(1) 
+        loans_subset_df['term_in_num'] = v_term_in_num
+        # print(loans_subset_df.head(20))
+        v_actual_tot_amt = loans_subset_df['term_in_num'] * loans_subset_df['instalment'].astype(float).fillna(1)
+        loans_subset_df['actual_tot_amt'] = v_actual_tot_amt 
+        v_perc_of_ln_recd = loans_subset_df['total_payment'] / loans_subset_df['actual_tot_amt']*100 
+        loans_subset_df['perc_of_ln_recd'] = v_perc_of_ln_recd 
+        print(loans_subset_df.head())
+        sns.scatterplot(y=loans_subset_df['funded_amount'], x=loans_subset_df['perc_of_ln_recd'])
+        plt.show()
+

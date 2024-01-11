@@ -72,9 +72,6 @@ class DataFrameTransform:
     def per_of_loans_recovered(self):
         loans_subset_df = self.df[['funded_amount','total_payment', 'term', 'instalment']].copy()
         print(loans_subset_df.head())
-        # loans_subset_df['perc_of_ln_recd'] = self.df(['total_payment'] / ['funded_amount'])
-        # loans_subset_df = loans_subset_df.assign(perc_of_ln_recd=self.df(['total_payment'] / ['funded_amount']))
-        # loans_subset_df['perc_of_ln_recd'] = self.df['total_payment'] / self.df['funded_amount']
         v_term_in_num = self.df['term'].str.slice(0,2).astype(float).fillna(1) 
         loans_subset_df['term_in_num'] = v_term_in_num
         # print(loans_subset_df.head(20))
@@ -86,3 +83,40 @@ class DataFrameTransform:
         sns.scatterplot(y=loans_subset_df['funded_amount'], x=loans_subset_df['perc_of_ln_recd'])
         plt.show()
 
+    def perc_of_loss_of_loans(self):
+        # v_perc_of_loss = self.df[(self.df.loan_status == 'Charged Off')].count()
+        v_perc_of_loss = (self.df[(self.df.loan_status == 'Charged Off')].shape[0] / self.df.shape[0]) * 100
+        print('% of loan_status == Charged Off', v_perc_of_loss)
+
+    def total_chared_off_amt(self):
+        tot_chrg_off_loan = self.df[(self.df.loan_status == 'Charged Off')]['loan_amount'].sum()
+        print('total loan_amount for Charged-off loans :',tot_chrg_off_loan) 
+        tot_chrg_off_recory = self.df[(self.df.loan_status == 'Charged Off')]['recoveries'].sum()
+        print('total recoveries for Charged-off loans :',tot_chrg_off_recory) 
+        print('% of recoveries and loan_amount for Charged-off loans :', (tot_chrg_off_recory / tot_chrg_off_loan)*100)
+    
+    def loss_in_revenue_amt(self):
+        ## Creating temp DF
+        loans_subset_df = self.df[(self.df.loan_status == 'Charged Off')][['loan_amount', 'term', 'int_rate', 'recoveries']].copy()
+        ## created term as numeric and appended to temp-df
+        v_term_in_num = loans_subset_df['term'].str.slice(0,2).astype(float).fillna(0) 
+        loans_subset_df['term_in_num'] = v_term_in_num
+        ## calculated potential loss amt for charged-off loans and appended to temp-df
+        v_tot_pot_amt = loans_subset_df['loan_amount'] * (loans_subset_df['term_in_num']/12) * loans_subset_df['int_rate'] 
+        loans_subset_df['tot_pot_amt'] = v_tot_pot_amt
+        ## deducted recoveries from potential loss amt for charged-off loans and appended to temp-df
+        v_pot_amt_aftr_recry = loans_subset_df['tot_pot_amt'] - loans_subset_df['recoveries']
+        loans_subset_df['pot_amt_aftr_recry'] = v_pot_amt_aftr_recry
+        print(loans_subset_df.head())
+        ## showing total potential loss amt for charged-off loans 
+        print('Total loss in revenue for Charged-off loans :',loans_subset_df['pot_amt_aftr_recry'].sum()) 
+
+    def loss_for_paymnts_delay(self):
+        ## count of loans with status of Late
+        v_paymnts_delay_counts = self.df[self.df['loan_status'].str.contains('Late')]['id'].shape[0]
+        print('total v_paymnts_delay_counts for delayed payments :',v_paymnts_delay_counts) 
+        ## Totoal count of loans
+        v_tot_loans_count = self.df['id'].count()
+        print('total tot_loans_count for delayed payments :',v_tot_loans_count) 
+        ## percentage of delayed loans over total loans issued 
+        print('% of delayed payments over total loans :', (v_paymnts_delay_counts / v_tot_loans_count)*100)

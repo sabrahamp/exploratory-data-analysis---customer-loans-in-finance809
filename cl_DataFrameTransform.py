@@ -8,6 +8,7 @@ import missingno as msno
 import pylab
 import scipy.stats as stats
 from statsmodels.graphics.gofplots import qqplot
+import plotly.express as px
 
 class DataFrameTransform:
     def load_data(self):
@@ -120,3 +121,39 @@ class DataFrameTransform:
         print('total tot_loans_count for delayed payments :',v_tot_loans_count) 
         ## percentage of delayed loans over total loans issued 
         print('% of delayed payments over total loans :', (v_paymnts_delay_counts / v_tot_loans_count)*100)
+
+    def indicators_of_loss_by_grd_purp(self):
+        ## method to show Counts of Purpose of Loan per allocated Grade
+        loans_subset_df = self.df[['grade','purpose', 'home_ownership', 'loan_status']].copy()
+        print(loans_subset_df.head())
+        loans_subset_df = loans_subset_df.sort_values(by=["grade"])
+        fig = px.histogram(loans_subset_df, "purpose", facet_col="grade",
+             color="grade",
+             title="Counts of Purpose of Loan per allocated Grade",
+             labels={"grade": "Grade", "purpose": "Purpose"},
+             height=2000,
+             facet_col_wrap=2,
+             facet_col_spacing=0.1)
+
+        fig.update_layout(showlegend=False)
+        fig.update_xaxes(showticklabels=True, tickangle=45)
+        fig.update_yaxes(matches=None, showticklabels=True)
+        fig.show()
+
+    def indicators_of_loss_by_grd_sts(self):
+        ## method to show Counts of Loan Status per allocated Grade
+        loans_subset_df = self.df[['grade','purpose', 'home_ownership', 'loan_status']].copy()
+        print(loans_subset_df.head())
+        loans_subset_df = loans_subset_df.sort_values(by=["grade"])
+        fig = px.histogram(loans_subset_df, "loan_status", facet_col="grade",
+             color="grade",
+             title="Counts of Loan Status per allocated Grade",
+             labels={"grade": "Grade", "loan_status": "Loan Status"},
+             height=2000,
+             facet_col_wrap=2,
+             facet_col_spacing=0.1)
+
+        fig.update_layout(showlegend=False)
+        fig.update_xaxes(showticklabels=True, tickangle=45)
+        fig.update_yaxes(matches=None, showticklabels=True)
+        fig.show()

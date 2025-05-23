@@ -1,6 +1,7 @@
 ## all imports of packages
 import pandas as pd
 from scipy.stats import normaltest
+from datetime import datetime
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ import pylab
 import scipy.stats as stats
 from statsmodels.graphics.gofplots import qqplot
 import plotly.express as px
+
 
 class Plotter:
     def load_data(self):
@@ -32,7 +34,11 @@ class Plotter:
         plt.show()
 
     def identify_Collinearity(self):
-        loans_subset_df = self.df[['loan_amount', 'int_rate' ]]
+        loans_subset_df = self.df[['loan_amount', 'int_rate', 'annual_inc', 'funded_amount']]
         fig = px.imshow(loans_subset_df.corr(), title="Correlation heatmap of loans dataframe")
         fig.show()
 
+    def identify_Collinearity_with_parm(self, p_loans_subset_df, p_title="Correlation heatmap"):
+        # loans_subset_df = self.df[['loan_amount', 'int_rate', 'annual_inc', 'funded_amount']]
+        fig = px.imshow(p_loans_subset_df.corr(), title=p_title)
+        fig.show()
